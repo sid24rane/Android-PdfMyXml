@@ -49,12 +49,6 @@ public class PdfDocument implements IDisposable{
     private boolean                             _isWorking              = false;
     // inflate on main thread
     private boolean                             _inflateOnMainThread    = false;
-    // progress dialog
-    private ProgressDialog                      _ringProgressDialog;
-    // progress dialog message
-    private String                              _txtProgressMessage     = "Generating Pdf..";
-    // progress dialog title
-    private String                              _txtProgressTitle       = "Please wait";
     // rendered pages streams
     protected ArrayList<InputStream>            _pages_rendered         = null;
     // views to render
@@ -193,24 +187,8 @@ public class PdfDocument implements IDisposable{
         _orientation = orientation;
     }
 
-    /**
-     * set the text message for the progress dialog
-     *
-     * @param resId a string resource identifier
-     */
-    public void setProgressMessage(int resId) {
-        _txtProgressMessage = _ctx.getString(resId);
-    }
-
-    /**
-     * set the text title for the progress dialog
-     *
-     * @param resId a string resource identifier
-     */
-    public void setProgressTitle(int resId) {
-        _txtProgressTitle = _ctx.getString(resId);
-    }
-
+  
+  
     /**
      *
      * @return the pdf file name
@@ -277,17 +255,6 @@ public class PdfDocument implements IDisposable{
 
         Resources res = _ctx.getResources();
 
-        if (window != null) {
-            if(_ringProgressDialog !=null) {
-                _ringProgressDialog.dismiss();
-            }
-
-            _ringProgressDialog = ProgressDialog.show(window, _txtProgressTitle, _txtProgressMessage, true);
-
-            if(!_ringProgressDialog.isShowing())
-                _ringProgressDialog.show();
-        }
-
         _thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -314,9 +281,7 @@ public class PdfDocument implements IDisposable{
                 _handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if(_ringProgressDialog !=null)
-                            _ringProgressDialog.dismiss();
-
+                      
                         if(_listener != null) {
                             if(_error != null)
                                 _listener.onError(_error);
@@ -425,10 +390,6 @@ public class PdfDocument implements IDisposable{
         file_name   = null;
         file        = null;
 
-        if(_ringProgressDialog != null) {
-            _ringProgressDialog.dismiss();
-            _ringProgressDialog = null;
-        }
     }
 
     /**
@@ -441,7 +402,6 @@ public class PdfDocument implements IDisposable{
         _listener = null;
         _handler = null;
         _thread = null;
-        _ringProgressDialog = null;
     }
 
     /**
@@ -591,28 +551,8 @@ public class PdfDocument implements IDisposable{
             return this;
         }
 
-        /**
-         * set the text message for the progress dialog
-         *
-         * @param resId a string resource identifier
-         */
-        public Builder progressMessage(int resId) {
-            _doc.setProgressMessage(resId);
 
-            return this;
-        }
-
-        /**
-         * set the text title for the progress dialog
-         *
-         * @param resId a string resource identifier
-         */
-        public Builder progressTitle(int resId) {
-            _doc.setProgressTitle(resId);
-
-            return this;
-        }
-
+    
     }
 
 }
